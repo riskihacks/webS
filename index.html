@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riski Dermawan - Visual Designer & Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8A2BE2; /* Ungu Elektrik */
+            --secondary-color: #00FFFF; /* Cyan */
+            --accent-color: #FF00FF; /* Pink Neon */
+            --bg-color: #121212;
+            --text-color: #E0E0E0;
+            --card-bg: rgba(30, 30, 30, 0.8);
+            --glass-blur: saturate(180%) blur(10px);
+            --neon-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
+            --neon-shadow-secondary: 0 0 5px var(--secondary-color), 0 0 10px var(--secondary-color), 0 0 15px var(--secondary-color);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+            cursor: none; /* Hide default cursor */
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            z-index: 9999;
+            mix-blend-mode: difference;
+        }
+
+        .custom-cursor.pointer {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(138, 43, 226, 0.3); /* Primary color with alpha */
+            border-color: var(--secondary-color);
+        }
+        
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+
+
+        /* Glassmorphism */
+        .glassmorphic {
+            background: rgba(255, 255, 255, 0.05); /* Lighten card bg for glass effect */
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem; /* Tailwind's rounded-xl */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Neon Text & Shadows */
+        .text-neon-primary {
+            color: var(--primary-color);
+            text-shadow: var(--neon-shadow);
+        }
+        .text-neon-secondary {
+            color: var(--secondary-color);
+            text-shadow: var(--neon-shadow-secondary);
+        }
+        .button-neon {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+        .button-neon:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            box-shadow: var(--neon-shadow);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            position: relative;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: 1s all ease;
+        }
+        .reveal.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Hero Section Typing Effect */
+        #typed-name span {
+            opacity: 0;
+            transition: opacity 0.1s;
+            display: inline-block; /* Required for individual letter animation */
+        }
+        #typed-name span.visible {
+            opacity: 1;
+        }
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em; /* Adjust based on font size */
+            background-color: var(--secondary-color);
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: bottom;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Skill Bar Animation */
+        .skill-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0.25rem;
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: var(--neon-shadow);
+        }
+        
+        /* Portfolio Item Hover */
+        .portfolio-item {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+        .portfolio-item:hover {
+            transform: scale(1.05) rotateZ(2deg);
+            box-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
+        }
+
+        /* Modal Styling */
+        .modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .modal.hidden {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            pointer-events: none;
+        }
+        .modal-content {
+            max-height: 90vh;
+        }
+
+        /* 3D Tilt Effect (applied via JS) */
+        [data-tilt] {
+            transition: transform 0.1s ease-out; /* Smooth out tilt transitions */
+        }
+
+        /* Parallax Background Elements */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden; /* Prevent scrollbars from particles */
+        }
+        #particles-js {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Header elements */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(18, 18, 18, 0.7); /* Slightly transparent header */
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Card hover effect */
+        .card-hover-effect {
+             transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), var(--neon-shadow);
+        }
+
+        /* Glitch effect for hero text */
+        .glitch {
+            position: relative;
+            font-size: 5rem; /* Tailwind text-6xl or 7xl equivalent */
+            font-weight: 900; /* Tailwind font-black */
+            color: var(--text-color);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color); /* Match body background */
+            overflow: hidden;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--primary-color);
+            animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--secondary-color), 2px 2px var(--accent-color);
+            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip-path: polygon(0 2%, 100% 2%, 100% 98%, 0 98%); }
+            25% { clip-path: polygon(0 70%, 100% 70%, 100% 98%, 0 98%); }
+            50% { clip-path: polygon(0 45%, 100% 45%, 100% 60%, 0 60%); }
+            75% { clip-path: polygon(0 15%, 100% 15%, 100% 30%, 0 30%); }
+            100% { clip-path: polygon(0 80%, 100% 80%, 100% 99%, 0 99%); }
+        }
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(5% 0 90% 0); }
+            25% { clip-path: inset(70% 0 10% 0); }
+            50% { clip-path: inset(40% 0 30% 0); }
+            75% { clip-path: inset(10% 0 80% 0); }
+            100% { clip-path: inset(90% 0 5% 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(90% 0 5% 0); }
+            25% { clip-path: inset(10% 0 70% 0); }
+            50% { clip-path: inset(50% 0 30% 0); }
+            75% { clip-path: inset(80% 0 10% 0); }
+            100% { clip-path: inset(5% 0 90% 0); }
+        }
+
+        /* Section padding */
+        section {
+            padding: 100px 2rem; /* Increased padding */
+            min-height: 100vh; /* Ensure sections take up viewport height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .section-title {
+            font-size: 3rem; /* Tailwind text-5xl */
+            font-weight: 700; /* Tailwind font-bold */
+            margin-bottom: 3rem; /* Tailwind mb-12 */
+            text-align: center;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--primary-color);
+            margin: 1rem auto 0;
+            border-radius: 2px;
+            box-shadow: var(--neon-shadow);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+    <div class="cursor-trail"></div>
+    <div class="cursor-trail"></div>
+    <div class="cursor-trail"></div>
+    <div class="cursor-trail"></div>
+
+
+    <div class="parallax-bg">
+        <div id="particles-js"></div>
+    </div>
+
+    <header>
+        <div class="text-2xl font-orbitron font-bold text-neon-secondary">RD.</div>
+        <div class="flex items-center space-x-4">
+            <div id="digital-clock" class="text-lg font-orbitron"></div>
+            <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                <i class="fas fa-moon text-xl text-neon-primary"></i>
+            </button>
+            <div class="relative">
+                <button id="themeSwitcherButton" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-palette text-xl text-neon-accent"></i>
+                </button>
+                <div id="themeOptions" class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg p-2 hidden z-20 glassmorphic">
+                    <button data-color="purple" class="block w-full text-left px-4 py-2 text-sm hover:bg-purple-600 rounded">Ungu Elektrik</button>
+                    <button data-color="blue" class="block w-full text-left px-4 py-2 text-sm hover:bg-blue-600 rounded">Biru Cyber</button>
+                    <button data-color="pink" class="block w-full text-left px-4 py-2 text-sm hover:bg-pink-600 rounded">Pink Neon</button>
+                    <button data-color="green" class="block w-full text-left px-4 py-2 text-sm hover:bg-green-600 rounded">Hijau Matrix</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 space-y-3">
+        <a href="#hero" class="nav-dot block w-3 h-3 bg-gray-500 rounded-full hover:bg-primary-color transition-colors" title="Beranda"></a>
+        <a href="#about" class="nav-dot block w-3 h-3 bg-gray-500 rounded-full hover:bg-primary-color transition-colors" title="Tentang Saya"></a>
+        <a href="#skills" class="nav-dot block w-3 h-3 bg-gray-500 rounded-full hover:bg-primary-color transition-colors" title="Keahlian"></a>
+        <a href="#portfolio" class="nav-dot block w-3 h-3 bg-gray-500 rounded-full hover:bg-primary-color transition-colors" title="Portofolio"></a>
+        <a href="#contact" class="nav-dot block w-3 h-3 bg-gray-500 rounded-full hover:bg-primary-color transition-colors" title="Kontak"></a>
+    </nav>
+
+    <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);"></div>
+        <div class="z-10">
+            <h1 id="hero-name" class="glitch text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-wider font-orbitron" data-text="RISKI DERMAWAN">
+                RISKI DERMAWAN
+            </h1>
+            <p id="hero-subtitle" class="mt-6 text-xl sm:text-2xl md:text-3xl text-neon-secondary font-orbitron"></p>
+            <div class="mt-10">
+                <a href="#contact" class="button-neon text-lg">Hubungi Saya</a>
+            </div>
+            <p class="mt-12 text-lg italic opacity-80">“My motion tells your story.”</p>
+        </div>
+        <div class="absolute bottom-10 w-full text-center">
+            <a href="#about" class="text-4xl text-gray-500 hover:text-primary-color animate-bounce">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <section id="about" class="container mx-auto reveal">
+        <h2 class="section-title text-neon-primary">Tentang Saya</h2>
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-perspective="1000" class="glassmorphic p-8 rounded-xl card-hover-effect">
+                <img src="https://placehold.co/400x400/8A2BE2/FFFFFF?text=Riski+D" alt="Foto Riski Dermawan" class="w-64 h-64 mx-auto rounded-full object-cover border-4 border-primary-color shadow-lg mb-6">
+                <h3 class="text-3xl font-bold text-center mb-2 text-neon-secondary">Riski Dermawan</h3>
+                <p class="text-center text-lg text-gray-400">17 Tahun | Riau, Indonesia</p>
+                <p class="text-center text-lg text-gray-400 mb-4">SMKN 01 Pangkalan Kuras</p>
+                <div class="flex justify-center space-x-6 text-3xl">
+                    <a href="https://instagram.com/riskidr87" target="_blank" class="hover:text-pink-500 transition-colors"><i class="fab fa-instagram"></i></a>
+                    <a href="mailto:riskialightmt@gmail.com" class="hover:text-blue-400 transition-colors"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="space-y-6 text-lg leading-relaxed">
+                <p class="reveal">Halo! Saya Riski Dermawan, seorang <strong class="text-neon-primary">Visual Designer</strong> dan <strong class="text-neon-secondary">Video Editor</strong> muda yang bersemangat dengan dunia kreatif digital. Sejak menemukan passion saya dalam mengolah visual dan narasi melalui video, saya terus mengasah kemampuan untuk menciptakan karya yang tidak hanya menarik secara estetika, tetapi juga mampu menyampaikan cerita yang kuat.</p>
+                <p class="reveal">Perjalanan saya dimulai dari eksplorasi aplikasi mobile seperti PixelLab dan CapCut, yang kemudian berkembang ke platform yang lebih kompleks seperti Alight Motion dan PicsArt. Tidak berhenti di situ, rasa ingin tahu membawa saya mempelajari dasar-dasar pengembangan web (HTML, CSS, JavaScript) hingga framework modern seperti Next.js dan bahasa Dart, membuka cakrawala baru dalam mewujudkan ide-ide kreatif saya secara interaktif.</p>
+                <p class="reveal">Saya percaya bahwa <strong class="italic">“Design is not how it looks, but how it feels.”</strong> Oleh karena itu, setiap proyek saya kerjakan dengan detail dan dedikasi tinggi, berusaha untuk memberikan pengalaman visual yang berkesan dan bermakna.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="container mx-auto reveal">
+        <h2 class="section-title text-neon-primary">Keahlian Saya</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt data-tilt-max="15" data-tilt-speed="500" data-tilt-perspective="1200">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-mobile-alt text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">PixelLab</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Desain grafis mobile, manipulasi teks dan gambar.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="90%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">90%</p>
+            </div>
+            <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-video text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">CapCut</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Editing video cepat, efek transisi, color grading dasar.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="95%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">95%</p>
+            </div>
+            <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-drafting-compass text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">Alight Motion</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Motion graphics, animasi kompleks, visual effects.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="85%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">85%</p>
+            </div>
+            <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-paint-brush text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">PicsArt</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Photo editing, filter kreatif, kolase.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="80%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">80%</p>
+            </div>
+            <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-html5 text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">HTML</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Struktur dasar website, markup semantik.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="75%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">75%</p>
+            </div>
+            <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-css3-alt text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">CSS</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Styling website, layouting, animasi dasar.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="70%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">70%</p>
+            </div>
+             <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-js-square text-3xl text-neon-secondary mr-4"></i>
+                    <h3 class="text-2xl font-semibold">JavaScript</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Interaktivitas website, manipulasi DOM.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="60%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">60%</p>
+            </div>
+             <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-feather-alt text-3xl text-neon-secondary mr-4"></i> <h3 class="text-2xl font-semibold">Dart</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Pengembangan aplikasi mobile (Flutter), logika backend.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="50%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">50%</p>
+            </div>
+             <div class="skill-item glassmorphic p-6 rounded-xl card-hover-effect" data-tilt>
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-react text-3xl text-neon-secondary mr-4"></i> <h3 class="text-2xl font-semibold">Next.js</h3>
+                </div>
+                <p class="text-sm text-gray-400 mb-2">Framework React, Server-Side Rendering, Static Site Generation.</p>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div class="skill-bar-inner h-3 rounded-full" data-level="45%"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-neon-primary font-semibold">45%</p>
+            </div>
+        </div>
+         <p class="mt-12 text-center text-lg italic opacity-80">“Every detail matters. Every frame speaks.”</p>
+    </section>
+
+    <section id="portfolio" class="container mx-auto reveal">
+        <h2 class="section-title text-neon-primary">Portofolio Saya</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="portfolio-item glassmorphic rounded-xl overflow-hidden cursor-pointer" data-tilt data-title="Proyek Visual Dinamis" data-description="Sebuah eksplorasi motion graphics dengan Alight Motion, menggabungkan tipografi kinetik dan efek visual yang memukau." data-image="https://placehold.co/600x400/8A2BE2/FFFFFF?text=Proyek+1">
+                <img src="https://placehold.co/600x400/8A2BE2/FFFFFF?text=Proyek+1" alt="Proyek 1" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-neon-secondary">Proyek Visual Dinamis</h3>
+                    <p class="text-sm text-gray-400">Motion Graphics</p>
+                </div>
+            </div>
+            <div class="portfolio-item glassmorphic rounded-xl overflow-hidden cursor-pointer" data-tilt data-title="Desain Logo Futuristik" data-description="Pembuatan logo untuk brand teknologi dengan konsep minimalis dan futuristik menggunakan PixelLab." data-image="https://placehold.co/600x400/00FFFF/121212?text=Proyek+2">
+                <img src="https://placehold.co/600x400/00FFFF/121212?text=Proyek+2" alt="Proyek 2" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-neon-secondary">Desain Logo Futuristik</h3>
+                    <p class="text-sm text-gray-400">Branding</p>
+                </div>
+            </div>
+            <div class="portfolio-item glassmorphic rounded-xl overflow-hidden cursor-pointer" data-tilt data-title="Video Cinematic Pendek" data-description="Editing video perjalanan dengan CapCut, fokus pada color grading sinematik dan penceritaan visual." data-image="https://placehold.co/600x400/FF00FF/FFFFFF?text=Proyek+3">
+                <img src="https://placehold.co/600x400/FF00FF/FFFFFF?text=Proyek+3" alt="Proyek 3" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-neon-secondary">Video Cinematic Pendek</h3>
+                    <p class="text-sm text-gray-400">Video Editing</p>
+                </div>
+            </div>
+            <div class="portfolio-item glassmorphic rounded-xl overflow-hidden cursor-pointer" data-tilt data-title="Manipulasi Foto Surealis" data-description="Karya seni digital menggunakan PicsArt, menggabungkan beberapa elemen foto menjadi komposisi surealis." data-image="https://placehold.co/600x400/39FF14/121212?text=Proyek+4">
+                <img src="https://placehold.co/600x400/39FF14/121212?text=Proyek+4" alt="Proyek 4" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-neon-secondary">Manipulasi Foto Surealis</h3>
+                    <p class="text-sm text-gray-400">Digital Art</p>
+                </div>
+            </div>
+            <div class="portfolio-item glassmorphic rounded-xl overflow-hidden cursor-pointer" data-tilt data-title="Website Portofolio Awal" data-description="Eksperimen pertama membuat website portofolio sederhana menggunakan HTML, CSS, dan sedikit JavaScript." data-image="https://placehold.co/600x400/F4D03F/121212?text=Proyek+5">
+                <img src="https://placehold.co/600x400/F4D03F/121212?text=Proyek+5" alt="Proyek 5" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-neon-secondary">Website Portofolio Awal</h3>
+                    <p class="text-sm text-gray-400">Web Development</p>
+                </div>
+            </div>
+            <div class="portfolio-item glassmorphic rounded-xl overflow-hidden cursor-pointer" data-tilt data-title="Animasi Teks Interaktif" data-description="Membuat animasi teks yang responsif terhadap interaksi pengguna menggunakan JavaScript." data-image="https://placehold.co/600x400/FD7E14/FFFFFF?text=Proyek+6">
+                <img src="https://placehold.co/600x400/FD7E14/FFFFFF?text=Proyek+6" alt="Proyek 6" class="w-full h-64 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-neon-secondary">Animasi Teks Interaktif</h3>
+                    <p class="text-sm text-gray-400">JavaScript Animation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="portfolioModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[1001] hidden">
+        <div class="modal-content glassmorphic p-8 rounded-xl max-w-2xl w-full relative transform transition-all duration-300 ease-out">
+            <button id="closeModal" class="absolute top-4 right-4 text-3xl text-gray-400 hover:text-white transition-colors">&times;</button>
+            <img id="modalImage" src="" alt="Detail Proyek" class="w-full h-64 md:h-96 object-contain rounded-lg mb-6">
+            <h3 id="modalTitle" class="text-3xl font-bold mb-3 text-neon-primary"></h3>
+            <p id="modalDescription" class="text-lg leading-relaxed"></p>
+        </div>
+    </div>
+
+    <section id="contact" class="container mx-auto reveal">
+        <h2 class="section-title text-neon-primary">Hubungi Saya</h2>
+        <div class="max-w-2xl mx-auto glassmorphic p-8 sm:p-12 rounded-xl" data-tilt>
+            <form id="contactForm" class="space-y-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-neon-secondary mb-1">Nama Lengkap</label>
+                    <input type="text" name="name" id="name" required
+                           class="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-primary-color focus:border-primary-color transition-all placeholder-gray-500 text-white">
+                    <p class="text-red-500 text-xs mt-1 error-message hidden">Nama tidak boleh kosong.</p>
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-neon-secondary mb-1">Alamat Email</label>
+                    <input type="email" name="email" id="email" required
+                           class="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-primary-color focus:border-primary-color transition-all placeholder-gray-500 text-white">
+                    <p class="text-red-500 text-xs mt-1 error-message hidden">Format email tidak valid.</p>
+                    <p class="text-yellow-500 text-xs mt-1 whitelist-message hidden">Domain email tidak diizinkan.</p>
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-medium text-neon-secondary mb-1">Pesan Anda</label>
+                    <textarea name="message" id="message" rows="5" required
+                              class="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-primary-color focus:border-primary-color transition-all placeholder-gray-500 text-white"></textarea>
+                    <p class="text-red-500 text-xs mt-1 error-message hidden">Pesan tidak boleh kosong.</p>
+                </div>
+                <div>
+                    <button type="submit" class="w-full button-neon text-lg font-semibold">
+                        Kirim Pesan <i class="fas fa-paper-plane ml-2"></i>
+                    </button>
+                </div>
+            </form>
+            <div id="formSuccessMessage" class="mt-6 p-4 bg-green-500 bg-opacity-30 text-green-300 border border-green-500 rounded-md hidden text-center">
+                Pesan Anda berhasil dikirim! Saya akan segera menghubungi Anda.
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-12 border-t border-gray-800">
+        <p class="text-gray-500">&copy; <span id="currentYear"></span> Riski Dermawan. All Rights Reserved.</p>
+        <p class="text-sm text-gray-600 mt-2">Designed with <i class="fas fa-heart text-red-500"></i> and a touch of <span class="text-neon-primary">Neon</span>.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+    <script>
+        // --- CORE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // Initialize all features
+            initDigitalClock();
+            initDarkMode();
+            initThemeSwitcher();
+            initScrollReveal();
+            initHeroTypingEffect();
+            initSkillBars();
+            initPortfolioModal();
+            initContactForm();
+            initCustomCursor();
+            initVanillaTilt();
+            initParticles();
+            initNavDots();
+        });
+
+        // --- NAVIGATION DOTS ---
+        function initNavDots() {
+            const sections = document.querySelectorAll('section[id]');
+            const navDots = document.querySelectorAll('.nav-dot');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5 // 50% of the section is visible
+            };
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navDots.forEach(dot => {
+                            dot.classList.remove('bg-primary-color');
+                            dot.classList.add('bg-gray-500');
+                            if (dot.getAttribute('href') === `#${id}`) {
+                                dot.classList.add('bg-primary-color');
+                                dot.classList.remove('bg-gray-500');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            navDots.forEach(dot => {
+                dot.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        }
+
+        // --- PARTICLES.JS BACKGROUND ---
+        function initParticles() {
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+            const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+            
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": [primaryColor, secondaryColor, "#ffffff"] // Array of colors
+                    },
+                    "shape": {
+                        "type": "circle", // "circle", "edge", "triangle", "polygon", "star"
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                    },
+                    "opacity": {
+                        "value": 0.6,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 120,
+                        "color": primaryColor, 
+                        "opacity": 0.3,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 3, // Slower speed
+                        "direction": "none", // "none", "top", "top-right", "right", "bottom-right", "bottom", "bottom-left", "left", "top-left"
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out", // "out", "bounce"
+                        "bounce": false,
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab" // "grab", "bubble", "repulse"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push" // "push", "remove", "bubble"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_opacity": 0.5
+                        },
+                        "bubble": {
+                            "distance": 200,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 100,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        }
+
+
+        // --- CUSTOM CURSOR ---
+        function initCustomCursor() {
+            const cursor = document.querySelector('.custom-cursor');
+            const trails = document.querySelectorAll('.cursor-trail');
+            const trailCount = trails.length;
+            let trailIndex = 0;
+            const trailPositions = Array(trailCount).fill({ x: 0, y: 0 });
+
+            document.addEventListener('mousemove', e => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+
+                trailPositions[trailIndex] = { x: e.clientX, y: e.clientY };
+                const currentTrail = trails[trailIndex];
+                currentTrail.style.left = e.clientX + 'px';
+                currentTrail.style.top = e.clientY + 'px';
+                currentTrail.style.opacity = '1';
+                
+                // Fade out older trails
+                for (let i = 0; i < trailCount; i++) {
+                    const idx = (trailIndex - i + trailCount) % trailCount;
+                    trails[idx].style.opacity = 1 - (i / trailCount) * 0.8; // More gradual fade
+                }
+
+                trailIndex = (trailIndex + 1) % trailCount;
+            });
+
+            document.querySelectorAll('a, button, .portfolio-item, .skill-item, input, textarea, .nav-dot').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('pointer'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('pointer'));
+            });
+        }
+
+        // --- VANILLA TILT.JS ---
+        function initVanillaTilt() {
+            VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+                max: 15, // Max tilt rotation (degrees)
+                speed: 600, // Speed of the enter/exit transition
+                glare: true, // If glare effect should be shown
+                "max-glare": 0.3 // From 0 - 1
+            });
+        }
+        
+        // --- DIGITAL CLOCK ---
+        function initDigitalClock() {
+            const clockElement = document.getElementById('digital-clock');
+            if (!clockElement) return;
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // --- DARK MODE TOGGLE ---
+        function initDarkMode() {
+            const toggleButton = document.getElementById('darkModeToggle');
+            const icon = toggleButton.querySelector('i');
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+
+            toggleButton.addEventListener('click', () => {
+                if (document.documentElement.classList.toggle('dark')) {
+                    localStorage.setItem('theme', 'dark');
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    localStorage.setItem('theme', 'light'); // Or remove it
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+                // Note: Dark mode here just adds a class. Actual dark mode styles are via Tailwind's dark: prefix or CSS variables.
+                // For this project, we are primarily using CSS variables for theme, so this toggle might be redundant or need to adjust CSS vars.
+                // Let's make it simple: this toggle will just be for a hypothetical "light mode" which is not fully implemented.
+                // The main theme is dark by default.
+            });
+        }
+
+        // --- LIVE COLOR THEME SWITCHER ---
+        function initThemeSwitcher() {
+            const themeSwitcherButton = document.getElementById('themeSwitcherButton');
+            const themeOptions = document.getElementById('themeOptions');
+            const root = document.documentElement;
+
+            const themes = {
+                purple: { primary: '#8A2BE2', secondary: '#00FFFF', accent: '#FF00FF' }, // Ungu Elektrik
+                blue: { primary: '#007BFF', secondary: '#00FFFF', accent: '#FF69B4' },   // Biru Cyber
+                pink: { primary: '#FF00FF', secondary: '#00E5FF', accent: '#FFFF00' },   // Pink Neon
+                green: { primary: '#39FF14', secondary: '#00FFFF', accent: '#FFD700' }  // Hijau Matrix
+            };
+
+            themeSwitcherButton.addEventListener('click', () => {
+                themeOptions.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!themeSwitcherButton.contains(event.target) && !themeOptions.contains(event.target)) {
+                    themeOptions.classList.add('hidden');
+                }
+            });
+
+            themeOptions.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const themeName = e.target.dataset.color;
+                    if (themes[themeName]) {
+                        root.style.setProperty('--primary-color', themes[themeName].primary);
+                        root.style.setProperty('--secondary-color', themes[themeName].secondary);
+                        root.style.setProperty('--accent-color', themes[themeName].accent);
+                        themeOptions.classList.add('hidden');
+                        // Re-initialize particles with new colors
+                        if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+                           window.pJSDom[0].pJS.fn.vendors.destroypJS(); // Destroy existing instance
+                           window.pJSDom = []; // Clear the pJSDom array
+                        }
+                        initParticles(); // Re-initialize with new colors
+                    }
+                }
+            });
+        }
+
+        // --- SCROLL REVEAL ANIMATIONS ---
+        function initScrollReveal() {
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: unobserve after revealing to save resources
+                        // revealObserver.unobserve(entry.target); 
+                    } else {
+                        // Optional: remove 'active' to re-animate on scroll up
+                        // entry.target.classList.remove('active'); 
+                    }
+                });
+            }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
+
+            revealElements.forEach(el => revealObserver.observe(el));
+        }
+
+        // --- HERO SECTION TYPING EFFECT ---
+        function initHeroTypingEffect() {
+            const subtitleElement = document.getElementById('hero-subtitle');
+            if (!subtitleElement) return;
+            const titles = ["Visual Designer", "Video Editor Professional", "Creative Thinker"];
+            let titleIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+
+            function type() {
+                const currentTitle = titles[titleIndex];
+                let text = '';
+                if (isDeleting) {
+                    text = currentTitle.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    text = currentTitle.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+                subtitleElement.innerHTML = `${text}<span class="typing-cursor"></span>`;
+
+                let typeSpeed = isDeleting ? 75 : 150;
+
+                if (!isDeleting && charIndex === currentTitle.length) {
+                    typeSpeed = 2000; // Pause at end
+                    isDeleting = true;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    titleIndex = (titleIndex + 1) % titles.length;
+                    typeSpeed = 500; // Pause before new title
+                }
+                setTimeout(type, typeSpeed);
+            }
+            setTimeout(type, 500); // Initial delay
+        }
+
+        // --- SKILL BARS ANIMATION ---
+        function initSkillBars() {
+            const skillBars = document.querySelectorAll('.skill-bar-inner');
+            const skillObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bar = entry.target;
+                        bar.style.width = bar.dataset.level;
+                        skillObserver.unobserve(bar); // Animate only once
+                    }
+                });
+            }, { threshold: 0.5 }); // Trigger when 50% of the bar container is visible
+
+            skillBars.forEach(bar => skillObserver.observe(bar));
+        }
+
+        // --- PORTFOLIO MODAL ---
+        function initPortfolioModal() {
+            const modal = document.getElementById('portfolioModal');
+            const closeModalButton = document.getElementById('closeModal');
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+
+            portfolioItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    modalImage.src = item.dataset.image || item.querySelector('img').src;
+                    modalTitle.textContent = item.dataset.title;
+                    modalDescription.textContent = item.dataset.description;
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; // Prevent background scroll
+                });
+            });
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = ''; // Restore scroll
+            }
+
+            closeModalButton.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) { // Click outside content
+                    closeModal();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape" && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        }
+
+        // --- CONTACT FORM ---
+        function initContactForm() {
+            const form = document.getElementById('contactForm');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const messageInput = document.getElementById('message');
+            const successMessage = document.getElementById('formSuccessMessage');
+            const whitelistedDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com']; // Example whitelist
+
+            function showError(inputElement, message) {
+                const errorElement = inputElement.nextElementSibling;
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+                inputElement.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                inputElement.classList.remove('focus:ring-primary-color', 'focus:border-primary-color');
+                // Add shake animation
+                inputElement.parentElement.classList.add('animate-shake');
+                setTimeout(() => inputElement.parentElement.classList.remove('animate-shake'), 500);
+            }
+
+            function clearError(inputElement) {
+                const errorElement = inputElement.nextElementSibling;
+                errorElement.classList.add('hidden');
+                inputElement.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                inputElement.classList.add('focus:ring-primary-color', 'focus:border-primary-color');
+            }
+            
+            // Add a simple shake animation for errors
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+                .animate-shake {
+                    animation: shake 0.5s ease-in-out;
+                }
+            `;
+            document.head.appendChild(style);
+
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                let isValid = true;
+
+                // Clear previous errors and success message
+                [nameInput, emailInput, messageInput].forEach(clearError);
+                const whitelistMsgEl = emailInput.parentElement.querySelector('.whitelist-message');
+                if (whitelistMsgEl) whitelistMsgEl.classList.add('hidden');
+                successMessage.classList.add('hidden');
+
+                // Name validation
+                if (nameInput.value.trim() === '') {
+                    showError(nameInput, 'Nama tidak boleh kosong.');
+                    isValid = false;
+                }
+
+                // Email validation
+                const emailValue = emailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (emailValue === '') {
+                    showError(emailInput, 'Email tidak boleh kosong.');
+                    isValid = false;
+                } else if (!emailRegex.test(emailValue)) {
+                    showError(emailInput, 'Format email tidak valid.');
+                    isValid = false;
+                } else {
+                    // Whitelist check (client-side UX, not security)
+                    const domain = emailValue.substring(emailValue.lastIndexOf('@') + 1);
+                    if (!whitelistedDomains.includes(domain.toLowerCase())) {
+                         const whitelistMsg = emailInput.parentElement.querySelector('.whitelist-message');
+                         if (whitelistMsg) {
+                            whitelistMsg.classList.remove('hidden');
+                            whitelistMsg.textContent = `Domain @${domain} tidak umum. Harap gunakan email dari domain yang lebih dikenal.`;
+                         }
+                        // isValid = false; // You can choose to make this a hard validation
+                    }
+                }
+
+                // Message validation
+                if (messageInput.value.trim() === '') {
+                    showError(messageInput, 'Pesan tidak boleh kosong.');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    // Simulate sending (using mailto:)
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+                    const message = messageInput.value.trim();
+                    const subject = `Pesan dari Portofolio: ${name}`;
+                    const body = `Nama: ${name}\nEmail: ${email}\n\nPesan:\n${message}`;
+                    
+                    window.location.href = `mailto:riskialightmt@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                    // Show success animation
+                    successMessage.classList.remove('hidden');
+                    successMessage.style.opacity = '0';
+                    successMessage.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        successMessage.style.opacity = '1';
+                        successMessage.style.transform = 'translateY(0)';
+                    }, 100);
+
+                    form.reset(); // Clear form
+                    setTimeout(() => { // Hide success message after a few seconds
+                       successMessage.style.opacity = '0';
+                       successMessage.style.transform = 'translateY(20px)';
+                       setTimeout(() => successMessage.classList.add('hidden'), 300);
+                    }, 5000);
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
